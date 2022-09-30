@@ -1,13 +1,11 @@
 /**
- * Leaving for a few months (13th April, 2022)
- * 
  * To Do:
  * 
  * Main Game Structure [ ]
  * --Base [x]
  * --Snakes [x]
  * --Ladders [x]
- * --Make it such so that no two ladders have feet at the same location and no two snakes have thier heads at the same location [ ]
+ * --Make it such so that no two ladders have feet at the same location and no two snakes have their heads at the same location [x]
  * --Players [ ]
  * 
  * Game Functioning [ ]
@@ -36,12 +34,17 @@
  * Any other things I think of in the future [ ]
  * 
  * **/
+ /**Developer Comments
+  * Intentionally not removing snake start point on ladder's end point to increase fun!
+  * 
+  * Had this comment earlier: 'Leaving for a few months (13th April, 2022)'
+  * **/
 
 //Red ones are snakes and orange ones are ladders
 
 random();
 
-println("Board Loading...");
+//println("Board Loading...");
 var startMillis = millis();
 
 /*Game Board*/
@@ -75,12 +78,22 @@ for(var i = 1; i <= n*n; i++){
 //Snake Layer Matrix Generation
 var snakeMatrix = [];
 var totalSnakeNumber = 5;
+var headRow, headIndex;
+
+function findUniqueheadIndex(){
+    headIndex = floor(random((headRow - 1)*n, (headRow - 1)*n + n));
+    for(var i = 0; i < snakeMatrix.length; i++){
+        if(headIndex === snakeMatrix[i][4]){
+            findUniqueheadIndex();
+        }
+    }
+} 
 
 for(var i = 1; i <= totalSnakeNumber; i++){
     var headRow = floor(random(2, n + 1));
     var tailRow = floor(random(1, headRow));
-    
-    var headIndex = floor(random((headRow - 1)*n, (headRow - 1)*n + n)); //I think I might forget what I did here
+
+    findUniqueheadIndex();
     var headX = baseMatrix[headIndex][0];
     var headY = baseMatrix[headIndex][1];
     
@@ -88,12 +101,22 @@ for(var i = 1; i <= totalSnakeNumber; i++){
     var tailX = baseMatrix[tailIndex][0];
     var tailY = baseMatrix[tailIndex][1];
     
-    snakeMatrix.push([headX, headY, tailX, tailY]);
+    snakeMatrix.push([headX, headY, tailX, tailY, headIndex]);
 }
 
 //Ladder Layer Matrix Generation
 var ladderMatrix = [];
 var totalLadderNumber = 5;
+var footRow, footIndex;
+
+function findUniquefootIndex(){
+    footIndex = floor(random((footRow - 1)*n, (footRow - 1)*n + n));
+    for(var i = 0; i < ladderMatrix.length; i++){
+        if(footIndex === ladderMatrix[i][4]){
+            findUniquefootIndex();
+        }
+    }
+}
 
 for(var i = 1; i <= totalLadderNumber; i++){
     var topRow = floor(random(2, n + 1));
@@ -103,11 +126,12 @@ for(var i = 1; i <= totalLadderNumber; i++){
     var topX = baseMatrix[topIndex][0];
     var topY = baseMatrix[topIndex][1];
     
-    var footIndex = floor(random((footRow - 1)*n, (footRow - 1)*n + n));
+    //var footIndex = floor(random((footRow - 1)*n, (footRow - 1)*n + n));
+    findUniquefootIndex();
     var footX = baseMatrix[footIndex][0];
     var footY = baseMatrix[footIndex][1];
     
-    ladderMatrix.push([topX, topY, footX, footY]);
+    ladderMatrix.push([topX, topY, footX, footY, footIndex]);
 }
 
 //@Display
@@ -150,7 +174,7 @@ function ladderLayer(){
 
 //println(snakeMatrix);
 // println(millis() - startMillis);
-println("Loaded! (~ " +  (millis() - startMillis).toString() + " milliseconds)");
+//println("Loaded! (~ " +  (millis() - startMillis).toString() + " milliseconds)");
 
 baseLayer();
 snakeLayer();
